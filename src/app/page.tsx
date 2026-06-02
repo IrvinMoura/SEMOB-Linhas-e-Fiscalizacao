@@ -57,10 +57,18 @@ export default function Home() {
   const [expandedSchedules, setExpandedSchedules] = useState<{ [key: string]: boolean }>({});
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // On mobile, the sidebar (list of lines) should be OPEN initially.
-  // Since it defaults to true, we don't need to force it closed anymore.
+  // Listen to popstate to toggle the sidebar when clicking the native phone back button
   useEffect(() => {
-    // keeping this empty or we can just remove it, but leaving it for future mobile-specific mounts
+    const handlePopState = (event: PopStateEvent) => {
+      if (typeof window !== 'undefined' && window.innerWidth <= 900) {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, []);
 
   // Fetch all bus lines once on mount
@@ -133,6 +141,7 @@ export default function Home() {
     // On mobile, clicking a line should show the map by closing the sidebar list
     if (typeof window !== 'undefined' && window.innerWidth <= 900) {
       setIsSidebarOpen(false);
+      window.history.pushState({ view: 'map' }, '');
     }
   };
 
@@ -346,7 +355,12 @@ export default function Home() {
           {!isSidebarOpen && (
             <button 
               className={styles.mobileMenuBtn} 
-              onClick={() => setIsSidebarOpen(true)}
+              onClick={() => {
+                setIsSidebarOpen(true);
+                if (typeof window !== 'undefined' && window.history.state?.view === 'map') {
+                  window.history.back();
+                }
+              }}
               aria-label="Voltar para a lista de linhas"
             >
               ☰ Linhas
