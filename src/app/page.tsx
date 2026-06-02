@@ -351,22 +351,6 @@ export default function Home() {
 
         {/* Right Side: Sticky Interactive Map */}
         <section className={styles.mapContainer}>
-          {/* Mobile Back Button */}
-          {!isSidebarOpen && (
-            <button 
-              className={styles.mobileMenuBtn} 
-              onClick={() => {
-                setIsSidebarOpen(true);
-                if (typeof window !== 'undefined' && window.history.state?.view === 'map') {
-                  window.history.back();
-                }
-              }}
-              aria-label="Voltar para a lista de linhas"
-            >
-              ☰ Linhas
-            </button>
-          )}
-
           {activeLine ? (
             <BusMapDynamic
               latitude={activeLine.terminal.latitude}
@@ -389,6 +373,22 @@ export default function Home() {
             </div>
           )}
         </section>
+
+        {/* Mobile Back Button - Moved outside mapContainer to fix z-index on some Androids */}
+        {!isSidebarOpen && (
+          <button 
+            className={styles.mobileMenuBtn} 
+            onClick={() => {
+              setIsSidebarOpen(true);
+              if (typeof window !== 'undefined' && window.history.state?.view === 'map') {
+                window.history.back();
+              }
+            }}
+            aria-label="Voltar para a lista de linhas"
+          >
+            ☰ Linhas
+          </button>
+        )}
 
       </div>
     </div>
